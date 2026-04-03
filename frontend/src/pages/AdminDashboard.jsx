@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, FileText, CheckCircle, Copy, Link as LinkIcon, AlertTriangle, 
   LayoutDashboard, Activity, CheckSquare, Zap, ShieldAlert, Cpu, FileDiff, 
-  Users, Bell, Play, FileSearch, X, Loader2, Award
+  Users, Bell, Play, FileSearch, X, Loader2, Award, Download, UploadCloud, QrCode, ArrowRight
 } from 'lucide-react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, 
@@ -407,6 +407,116 @@ const AdminDashboard = () => {
                        </button>
                     </div>
                  )}
+              </motion.div>
+            )}
+
+            {/* TAMPER CHECK TAB */}
+            {activeTab === 'tamper' && (
+              <motion.div key="tamper" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+                 <div className="flex flex-col items-center justify-center text-center mb-10">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-500/20 text-orange-400 mb-6 shadow-[0_0_30px_rgba(249,115,22,0.3)] border border-orange-500/30">
+                      <FileDiff className="w-8 h-8" />
+                    </div>
+                    <h2 className="text-4xl font-bold text-white mb-4">Deep Tamper Comparison</h2>
+                    <p className="text-slate-400 text-lg max-w-2xl">Upload the Original Ledger PDF alongside a Suspected Document. We highlight the exact differences using perceptual hashing.</p>
+                 </div>
+
+                 {tamperCheck ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       <div className="glass p-6 rounded-3xl border border-white/5 relative">
+                          <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-3xl">ORIGINAL MATCH</div>
+                          <div className="w-full aspect-[1/1.4] bg-slate-800 rounded-xl flex flex-col items-center justify-center border border-white/10">
+                             <FileText className="w-16 h-16 text-slate-500 mb-4" />
+                             <p className="text-slate-300 font-medium">B.Sc Computer Science</p>
+                             <p className="text-xs text-slate-500 mt-2 font-mono">Hash: 0x9A...2F1</p>
+                          </div>
+                       </div>
+                       <div className="glass p-6 rounded-3xl border border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.15)] relative">
+                          <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-3xl z-20">TAMPER DETECTED</div>
+                          <div className="w-full aspect-[1/1.4] bg-slate-800 rounded-xl relative overflow-hidden border border-red-500/30">
+                             <FileText className="w-16 h-16 text-slate-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                             <div className="absolute top-1/4 left-1/4 w-32 h-10 border-2 border-red-500 bg-red-500/20 z-10 flex items-center justify-center">
+                                <span className="text-red-300 text-xs font-bold uppercase drop-shadow-md">Forged Name</span>
+                             </div>
+                             <div className="absolute bottom-1/3 right-1/4 w-20 h-10 border-2 border-red-500 bg-red-500/20 z-10 flex items-center justify-center">
+                                <span className="text-red-300 text-[10px] font-bold uppercase drop-shadow-md">Altered GPA</span>
+                             </div>
+                          </div>
+                       </div>
+                       <button onClick={() => setTamperCheck(false)} className="md:col-span-2 mx-auto px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white font-medium transition-colors">Compare New Files</button>
+                    </div>
+                 ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                       <label className="glass p-12 rounded-3xl border border-white/5 border-dashed flex flex-col items-center text-center cursor-pointer hover:bg-white/5 transition-all">
+                          <UploadCloud className="w-12 h-12 text-slate-500 mb-4" />
+                          <p className="text-white font-semibold">Upload Genuine Ledger Document</p>
+                          <p className="text-xs text-slate-500 mt-2">.pdf or .png</p>
+                       </label>
+                       <label className="glass p-12 rounded-3xl border border-red-500/20 border-dashed flex flex-col items-center text-center cursor-pointer hover:bg-red-500/10 transition-all" onClick={() => { toast('Analyzing Document Anomalies...', { icon: '🔍' }); setTimeout(() => setTamperCheck(true), 2000); }}>
+                          <FileDiff className="w-12 h-12 text-red-400 mb-4" />
+                          <p className="text-white font-semibold">Upload Suspected Copy</p>
+                          <p className="text-xs text-red-400/50 mt-2">Trigger AI Diff Engine</p>
+                       </label>
+                    </div>
+                 )}
+              </motion.div>
+            )}
+
+            {/* VERIFIER PANEL TAB */}
+            {activeTab === 'bulk_verify' && (
+              <motion.div key="bulk" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                 <div className="flex justify-between items-center bg-blue-600/10 border border-blue-500/20 p-6 rounded-2xl">
+                    <div>
+                       <h2 className="text-xl font-bold text-white mb-2">Corporate Bulk Verifier</h2>
+                       <p className="text-slate-400 text-sm">Upload a CSV or ZIP of certificates to resolve thousands of credentials against the blockchain simultaneously.</p>
+                    </div>
+                    <button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all">
+                       <Upload className="w-4 h-4" />
+                       <span className="whitespace-nowrap">Upload Batch</span>
+                    </button>
+                 </div>
+
+                 <div className="glass rounded-3xl overflow-hidden border border-white/5">
+                    <div className="flex items-center justify-between p-6 border-b border-white/5">
+                       <h3 className="text-lg font-bold text-white">Recent Verification Logs</h3>
+                       <button className="flex items-center space-x-2 text-sm text-slate-400 hover:text-white transition-colors">
+                          <Download className="w-4 h-4" />
+                          <span>Download Report</span>
+                       </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                       <table className="w-full text-left text-sm text-slate-300">
+                          <thead className="bg-[#0f172a]/50 text-xs uppercase font-semibold text-slate-500 border-b border-white/5">
+                             <tr>
+                                <th className="px-6 py-4">Name</th>
+                                <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4">Blockchain Hash</th>
+                                <th className="px-6 py-4">Timestamp</th>
+                             </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/5">
+                             {[
+                               { name: "John Doe", status: "Valid", hash: "0x8F...2B1", time: "10 mins ago" },
+                               { name: "Jane Smith", status: "Valid", hash: "0x4C...9A0", time: "1 hr ago" },
+                               { name: "Mike Johnson", status: "Fake", hash: "Mismatch", time: "3 hrs ago" },
+                               { name: "Emily Davis", status: "Valid", hash: "0x11...FF4", time: "5 hrs ago" }
+                             ].map((row, i) => (
+                               <tr key={i} className="hover:bg-white/[0.02] transition-colors">
+                                  <td className="px-6 py-4 font-medium text-white">{row.name}</td>
+                                  <td className="px-6 py-4">
+                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${row.status === 'Valid' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                                        {row.status === 'Valid' ? <CheckCircle className="w-3 h-3 mr-1" /> : <X className="w-3 h-3 mr-1" />}
+                                        {row.status}
+                                     </span>
+                                  </td>
+                                  <td className="px-6 py-4 font-mono text-xs">{row.hash}</td>
+                                  <td className="px-6 py-4 text-slate-500">{row.time}</td>
+                               </tr>
+                             ))}
+                          </tbody>
+                       </table>
+                    </div>
+                 </div>
               </motion.div>
             )}
 

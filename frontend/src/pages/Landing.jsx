@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   ShieldAlert, Fingerprint, QrCode, ArrowRight, 
   Database, Lock, Zap, CheckCircle, Upload, Search, 
-  Star, Check, ShieldCheck, Activity, Users, Award
+  Star, Check, ShieldCheck, Activity, Users, Award, Cpu, FileDiff
 } from 'lucide-react';
 
 // --- CURSOR GLOW COMPONENT ---
@@ -61,6 +61,25 @@ const StatCounter = ({ end, label, prefix = "", suffix = "" }) => {
 
 
 const Landing = () => {
+  const ROTATING_TEXT = ["Academic Credentials", "Professional Skills", "Medical Records", "Corporate Identity"];
+  const [textIndex, setTextIndex] = useState(0);
+
+  const STATUS_STAGES = ["Verifying Credential...", "SHA-256 Hash Matched", "Ledger Synchronized!"];
+  const [statusIndex, setStatusIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTextIndex((current) => (current + 1) % ROTATING_TEXT.length);
+    }, 3000);
+    const statusInterval = setInterval(() => {
+      setStatusIndex((current) => (current + 1) % STATUS_STAGES.length);
+    }, 2000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(statusInterval);
+    };
+  }, []);
+
   return (
     <div className="relative isolate min-h-screen bg-[#06080F] text-slate-300 font-sans selection:bg-purple-500/30 overflow-x-hidden">
       <CursorGlow />
@@ -86,9 +105,20 @@ const Landing = () => {
           
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-7xl leading-[1.1]">
             Decentralized Trust for <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500">
-              Academic Credentials
-            </span>
+            <div className="mt-2 block min-h-[120px] sm:min-h-[180px] lg:min-h-[120px]">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={textIndex}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 inline-block pb-4 pr-4"
+                >
+                  {ROTATING_TEXT[textIndex]}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </h1>
           
           <p className="mt-6 text-lg leading-8 text-slate-400 max-w-lg">
@@ -111,47 +141,78 @@ const Landing = () => {
 
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none relative perspective-1000"
+          animate={{ opacity: 1, scale: 1, y: [0, -15, 0] }}
+          transition={{ duration: 1, delay: 0.2, y: { repeat: Infinity, duration: 6, ease: "easeInOut" } }}
+          whileHover={{ rotateX: 5, rotateY: -5, scale: 1.02 }}
+          className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none relative perspective-1000 z-10"
         >
           {/* Animated 3D-ish Card container */}
-          <div className="relative w-[320px] md:w-[400px] aspect-[4/5] rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-2xl shadow-2xl flex flex-col p-8 overflow-hidden group">
-            {/* Inner background glow */}
-            <div className="absolute -inset-1 bg-gradient-to-br from-blue-500/20 to-purple-600/20 blur-2xl group-hover:opacity-100 transition-opacity opacity-50 z-0"></div>
+          <div className="relative w-[340px] md:w-[420px] aspect-[4/5] rounded-3xl border border-white/10 bg-slate-900/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(59,130,246,0.2)] flex flex-col p-8 overflow-hidden group transform-gpu transition-all duration-500">
+            {/* Particles / Inner Glows */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+            <motion.div animate={{ opacity: [0.5, 0.8, 0.5], scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 4 }} className="absolute -inset-2 bg-gradient-to-br from-blue-500/30 via-purple-600/20 to-transparent blur-3xl opacity-70 z-0"></motion.div>
             
             <div className="relative z-10 h-full flex flex-col items-center justify-center text-center">
-               <div className="p-4 bg-white rounded-2xl shadow-xl mb-8 transform group-hover:scale-105 transition-transform duration-500">
-                 <QrCode className="w-40 h-40 text-slate-900" />
+               
+               {/* QR Container with Scanner */}
+               <div className="relative p-6 bg-white rounded-3xl shadow-2xl mb-6 border-4 border-slate-800/5 overflow-hidden transform group-hover:scale-105 transition-transform duration-500">
+                 <QrCode className="w-36 h-36 text-slate-900 relative z-10" />
+                 {/* Scanner Line */}
+                 <motion.div 
+                   animate={{ y: [-10, 150, -10] }} 
+                   transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                   className="absolute top-0 left-0 w-full h-[2px] bg-green-500 shadow-[0_0_20px_#22c55e] z-20"
+                 ></motion.div>
                </div>
-               <h3 className="text-2xl font-bold text-white mb-2">Scan to Verify</h3>
-               <p className="text-slate-400 text-sm mb-6">Point your camera to validate credential integrity.</p>
                
-               <div className="w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50 mb-6"></div>
+               {/* Dynamic Status Text */}
+               <div className="h-8 mb-4 flex items-center justify-center w-full">
+                 <AnimatePresence mode="wait">
+                   <motion.div 
+                     key={statusIndex}
+                     initial={{ opacity: 0, y: 10 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     exit={{ opacity: 0, y: -10 }}
+                     transition={{ duration: 0.3 }}
+                     className="font-mono text-sm tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 font-bold uppercase"
+                   >
+                     {STATUS_STAGES[statusIndex]}
+                   </motion.div>
+                 </AnimatePresence>
+               </div>
                
-               <div className="flex items-center space-x-2 bg-green-500/10 text-green-400 px-4 py-2 rounded-full border border-green-500/20 backdrop-blur-md">
-                 <ShieldCheck className="w-4 h-4" />
-                 <span className="text-sm font-semibold tracking-wide">CRYPTOGRAPHICALLY SECURE</span>
+               <p className="text-slate-400 text-sm mb-6 max-w-[250px]">Point your camera to decrypt the hash and validate integrity.</p>
+               
+               <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mb-6"></div>
+               
+               <div className="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded-full border border-white/20 backdrop-blur-md shadow-lg group-hover:border-purple-500/50 transition-colors">
+                 <ShieldCheck className="w-4 h-4 text-green-400" />
+                 <span className="text-xs font-bold tracking-wide">SECURED BY VIDYACHAIN</span>
                </div>
             </div>
 
-            {/* Floating Badges */}
-            <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} className="absolute -top-6 -right-8 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-20">
+            {/* 4 Floating Badges */}
+            <motion.div animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} className="absolute -top-6 -right-6 bg-slate-800 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-30">
                <Database className="w-4 h-4 text-blue-400" />
-               <span className="text-xs font-bold text-white">Ledger Synced</span>
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider">Blockchain Verified</span>
             </motion.div>
             
-            <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }} className="absolute bottom-16 -left-10 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-20">
-               <Fingerprint className="w-4 h-4 text-purple-400" />
-               <div className="flex flex-col items-start">
-                 <span className="text-[10px] text-slate-400 uppercase tracking-wider">SHA-256 Verified</span>
-                 <span className="text-xs font-mono text-white">0x9F4...A1B</span>
+            <motion.div animate={{ y: [0, 15, 0] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }} className="absolute bottom-24 -left-12 bg-slate-800 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-30">
+               <Fingerprint className="w-5 h-5 text-purple-400" />
+               <div className="flex flex-col items-start translate-y-px">
+                 <span className="text-[9px] text-slate-400 uppercase tracking-widest leading-none mb-1">Immutable Record</span>
+                 <span className="text-xs font-mono text-white leading-none">0x9F4...A1B</span>
                </div>
             </motion.div>
 
-            <motion.div animate={{ y: [0, -8, 0] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 2 }} className="absolute top-1/2 -right-12 bg-slate-800/80 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-20">
+            <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 2 }} className="absolute top-1/2 -right-14 bg-slate-800 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-30">
                <Lock className="w-4 h-4 text-green-400" />
-               <span className="text-xs font-bold text-white">Tamper-Proof</span>
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider">Tamper-Proof</span>
+            </motion.div>
+
+            <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 5.5, ease: "easeInOut", delay: 1.5 }} className="absolute bottom-6 -right-8 bg-slate-800 backdrop-blur-xl border border-white/10 p-3 rounded-2xl flex items-center space-x-2 shadow-xl z-30">
+               <Cpu className="w-4 h-4 text-orange-400" />
+               <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Secured</span>
             </motion.div>
           </div>
         </motion.div>
@@ -313,18 +374,37 @@ const Landing = () => {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl lg:text-center mb-20">
              <h2 className="text-3xl font-bold tracking-tight text-white mb-4">How It Works</h2>
-             <p className="text-slate-400">Three simple steps to secure the future of academic achievements.</p>
+             <p className="text-slate-400 text-lg">Four intelligent steps translating analog degrees into zero-trust digital assets.</p>
           </div>
 
           <div className="relative">
-             {/* Line connecting steps */}
-             <div className="hidden lg:block absolute top-[48px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-blue-500/20 via-purple-500/50 to-green-500/20 z-0"></div>
+             {/* Curved Line connecting steps */}
+             <div className="hidden lg:block absolute top-[24px] left-[12.5%] right-[12.5%] h-[48px] z-0 pointer-events-none">
+                <svg width="100%" height="100%" viewBox="0 0 100 24" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.1" />
+                      <stop offset="50%" stopColor="#a855f7" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#22c55e" stopOpacity="0.1" />
+                    </linearGradient>
+                  </defs>
+                  <path 
+                    d="M 0 12 Q 16.66 -10, 33.33 12 Q 50 34, 66.66 12 Q 83.33 -10, 100 12" 
+                    fill="none" 
+                    stroke="url(#waveGradient)" 
+                    strokeWidth="1.5" 
+                    strokeDasharray="2 2"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+             </div>
 
-             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
                 {[
-                  { step: 1, title: "Upload Certificate", desc: "Universities upload digital PDFs containing grade schemas via dashboard.", icon: Upload, shadow: "shadow-blue-500/20", border: 'border-blue-500/30' },
-                  { step: 2, title: "Generate Hash + QR", desc: "System locks cryptographic signature into the ledger and issues dynamic QR code.", icon: Fingerprint, shadow: "shadow-purple-500/20", border: 'border-purple-500/30' },
-                  { step: 3, title: "Scan & Verify", desc: "Recruiters scan the QR and verify authenticity, ensuring zero manipulation.", icon: Search, shadow: "shadow-green-500/20", border: 'border-green-500/30' }
+                  { step: 1, title: "Dashboard Issuance", desc: "Universities upload PDFs to irreversibly convert student metadata into Web3 hashes.", icon: Upload, shadow: "shadow-blue-500/20", border: 'border-blue-500/30' },
+                  { step: 2, title: "AI Anomaly Detection", desc: "Deepfake neural networks hunt for microscopic font variances and forged signatures.", icon: Cpu, shadow: "shadow-purple-500/20", border: 'border-purple-500/30' },
+                  { step: 3, title: "Deep Tamper Check", desc: "Perceptual hashing immediately highlights modified bounding boxes on forged documents.", icon: FileDiff, shadow: "shadow-orange-500/20", border: 'border-orange-500/30' },
+                  { step: 4, title: "Bulk Verification", desc: "Recruiters evaluate thousands of candidates simultaneously via CSV pipeline.", icon: Users, shadow: "shadow-green-500/20", border: 'border-green-500/30' }
                 ].map((item, i) => (
                   <motion.div 
                     key={item.step}
@@ -332,13 +412,14 @@ const Landing = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.2 }}
-                    className="flex flex-col items-center text-center group"
+                    className="flex flex-col items-center text-center group bg-slate-900/40 p-6 rounded-3xl border border-white/5 hover:border-white/10 transition-colors"
                   >
                      <div className={`w-24 h-24 rounded-full bg-[#0a0d14] border-2 ${item.border} flex items-center justify-center mb-6 shadow-xl ${item.shadow} group-hover:scale-110 transition-transform duration-300`}>
                         <item.icon className="w-10 h-10 text-white" />
                      </div>
-                     <h3 className="text-xl font-bold text-white mb-2">Step {item.step}: {item.title}</h3>
-                     <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+                     <h3 className="text-lg font-bold text-white mb-2">Step {item.step}</h3>
+                     <h4 className="text-md font-semibold text-purple-400 mb-3">{item.title}</h4>
+                     <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
                   </motion.div>
                 ))}
              </div>
