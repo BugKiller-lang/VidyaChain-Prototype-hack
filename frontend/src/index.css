@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #0f172a; /* Slate 900 */
+    --foreground: #f8fafc; /* Slate 50 */
+    --primary: #3b82f6; /* Blue 500 */
+    --primary-foreground: #ffffff;
+    --card: #1e293b; /* Slate 800 */
+    --card-foreground: #f8fafc;
+    --border: #334155; /* Slate 700 */
+    --ring: rgba(59, 130, 246, 0.5);
+  }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-slate-800/80 backdrop-blur-md border border-slate-700;
+  }
+}
+
+/* Custom Scrollbar for sleekness */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
